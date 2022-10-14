@@ -1,14 +1,35 @@
-import React from 'react'
-import Button from './Button';
-const PaginationButtonsList = ({page, handlePage}) => {
-    const BtnArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+import React, { useContext, useMemo } from 'react';
+import { pageContext } from '../Helper/pageContext';
+import Buttons from './Buttons';
+
+const PaginationButtonsList = () => {
+    const { state } = useContext(pageContext);
+
+    const generateButtons = (value) => {
+        let buttons = [];
+        for (let index = 1; index <= value; index++) {
+            buttons = [...buttons, <Buttons
+                key={index}
+                pageNumber={index}
+                currentPage={state.currentPage}
+            />];
+        }
+        return buttons;
+    }
+
+    const getButtons = useMemo(() => generateButtons(state.paginationButtons), []);
+
     return (
         <div className="pagination-buttons-list">
             {
-                BtnArr.map(btn => <Button id={`button-${btn}`} key={btn} text={btn} page={page} handlePage={handlePage}/>)
+                getButtons.map((Button) => {
+                    return (
+                        Button
+                    )
+                })
             }
         </div>
     )
 }
 
-export default PaginationButtonsList
+export { PaginationButtonsList }
