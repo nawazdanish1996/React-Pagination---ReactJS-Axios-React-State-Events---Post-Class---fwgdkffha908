@@ -1,33 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react'
 import '../styles/App.css';
-import Loader from './Loader';
-import PostList from './PostList';
-import fetchPosts from '../api/fetchPosts';
-import PaginationButtonsList from './PaginationButtonsList';
-const App = () => {
-    const [posts, setPosts] = useState([]);
-    const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(true);
+import { PostList } from './PostList';
+import { pageContext } from '../Helper/pageContext';
+import pageReducer from "../reducer/pageReducer";
+import { fetchPosts } from '../api/fetchPosts';
+import { LOADING, PAGE_DATA } from '../actions/action.type';
 
-    const handlePage = (pageNumber) => {
-      setPage(pageNumber);
-    }
+const App = () => {
+  const [state, dispatch] = useReducer(pageReducer, {
+    isLoading: true,
+    currentPage: 1,
+    paginationButtons: 20,
+    pageData: [],
+  });
+
+  const loadData = async (page) => {
+    const pageData = await fetchPosts(page);
+    dispatch({ type: LOADING, payload: { loading: false } });
+    dispatch({ type: PAGE_DATA, payload: { data: [...pageData] } });
+  }
 
   useEffect(() => {
-    const getData = async (page, limit) => {
-      setLoading(true);
-      const data = await fetchPosts(page, limit);
-      setPosts(data);
-      setLoading(false)
-    }
-    getData(page, 5);
-  }, [page])
-  
+    dispatch({ type: LOADING, payload: { loading: true } });
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    dispatch({ type: LOADING, payload: { loading: true } });
+    loadData(state.currentPage)
+  }, [state.currentPage])
+
   return (
     <div id="main">
-      
-      {loading ? <Loader /> : <PostList posts= {posts}/>}
-      <PaginationButtonsList page={page} handlePage={handlePage}/>
+      <pageContext.Provider value={{ state, dispatch }}>
+        <PostList />
+      </pageContext.Provider>
     </div>
   )
 }
