@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useContext } from 'react';
+import { PAGE_NUMBER } from '../actions/action.type';
+import { pageContext } from '../Helper/pageContext';
 
-const Button = ({page, text, id, handlePage}) => {
-  return (
-    <button className={page == text ? "active-btn" : null} id={id} onClick={() => handlePage(text)}>
-      {text}
-    </button>
-  );
-};
-
-export default Button;
+export default function Buttons({ pageNumber }) {
+    const { state, dispatch } = useContext(pageContext);
+    return (
+        <button
+            className={state.currentPage === pageNumber ? 'active-btn' : ''}
+            id={`button-${pageNumber}`}
+            onClick={() => {
+                dispatch({ type: PAGE_NUMBER, payload: { pageNumber: pageNumber } });
+            }}
+        >
+            {pageNumber}
+        </button>
+    )
+}
