@@ -1,13 +1,9 @@
-const fetchPosts = async (page, limit) => {
-    const API_URL = `https://jsonplaceholder.typicode.com/posts?_page=1&_limit=5`;
-    try{
-        const response = await fetch(API_URL);
-        if(!response.ok) throw Error("Wrong Url");
-        const data = await response.json();
-        return data;
-    }catch(err){
-        console.log(err);
-    }
+const fetchPosts = async (page = 1, limit = 5) => {
+    let pageData = [];
+    await fetch(`https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limit}`)
+        .then((response) => response.json())
+        .then((data) => pageData = [...data]);
+    return pageData;
 }
 
-export default fetchPosts;
+export { fetchPosts }
